@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Storage Test</title>
+    <style>
+        body { 
+            font-family: monospace; 
+            background: #1a1a1a; 
+            color: #00ff00; 
+            padding: 20px; 
+        }
+        .log { 
+            background: #000; 
+            padding: 15px; 
+            border: 1px solid #333; 
+            margin: 10px 0; 
+            white-space: pre-wrap;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover { background: #0088ff; }
+    </style>
+</head>
+<body>
+    <h1>🔍 CampusBae Attendance Storage Debugger</h1>
+    
+    <p>Open browser console (F12) and run these commands:</p>
+    
+    <div class="log">
+// Check which storage method is being used
+await window.AttendanceDebugger.checkStorageMethod();
+
+// Show all storage contents
+await window.AttendanceDebugger.showStorageContents();
+
+// Test the system end-to-end
+await window.AttendanceDebugger.testAttendanceStorage();
+
+// Clear localStorage (for testing)
+window.AttendanceDebugger.clearLocalStorage();
+    </div>
+
+    <h2>Quick Test Buttons</h2>
+    <button onclick="checkStorage()">Check Storage Method</button>
+    <button onclick="showContents()">Show Storage Contents</button>
+    <button onclick="testSystem()">Test Full System</button>
+    <button onclick="clearStorage()">Clear localStorage</button>
+
+    <div id="output" class="log"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.textContent += message + '\n';
+            console.log(message);
+        }
+        
+        async function checkStorage() {
+            if (!window.AttendanceDebugger) {
+                log('❌ AttendanceDebugger not available. Make sure you\'re on the main app.');
+                return;
+            }
+            
+            try {
+                const info = await window.AttendanceDebugger.checkStorageMethod();
+                log(`🔍 Storage Method: ${info.method}`);
+                log(`👤 User: ${info.user?.email || 'Not logged in'}`);
+                log(`🔗 Database Connected: ${info.databaseConnection}`);
+                log(`🔐 Authenticated: ${info.isAuthenticated}`);
+            } catch (e) {
+                log('❌ Error: ' + e.message);
+            }
+        }
+        
+        async function showContents() {
+            if (!window.AttendanceDebugger) {
+                log('❌ AttendanceDebugger not available. Make sure you\'re on the main app.');
+                return;
+            }
+            
+            await window.AttendanceDebugger.showStorageContents();
+            log('📊 Storage contents logged to console');
+        }
+        
+        async function testSystem() {
+            if (!window.AttendanceDebugger) {
+                log('❌ AttendanceDebugger not available. Make sure you\'re on the main app.');
+                return;
+            }
+            
+            await window.AttendanceDebugger.testAttendanceStorage();
+            log('🧪 System test completed - check console for details');
+        }
+        
+        function clearStorage() {
+            if (!window.AttendanceDebugger) {
+                log('❌ AttendanceDebugger not available. Make sure you\'re on the main app.');
+                return;
+            }
+            
+            window.AttendanceDebugger.clearLocalStorage();
+            log('🧹 localStorage cleared');
+        }
+        
+        // Check if we're running in the main app context
+        window.addEventListener('load', () => {
+            if (window.AttendanceDebugger) {
+                log('✅ AttendanceDebugger loaded and ready!');
+            } else {
+                log('⚠️  AttendanceDebugger not found. Open this page in the main app context or run commands in the console on your app page.');
+            }
+        });
+    </script>
+</body>
+</html>
