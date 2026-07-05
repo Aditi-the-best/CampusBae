@@ -26,7 +26,7 @@ export function NetworkingPage() {
       id: 1,
       name: 'Ishanvi Srivastava',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/ishanvi-srivastava-16i/',
       image: '/ish.png'
     },
@@ -34,7 +34,7 @@ export function NetworkingPage() {
       id: 2,
       name: 'Nishtha',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/nishtha-malik-8877a6325/',
       image: '/nish.png'
     },
@@ -42,7 +42,7 @@ export function NetworkingPage() {
       id: 3,
       name: 'Kavya Jain',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/kavya-jain-b6b0a0320/',
       image: '/kj.png'
     },
@@ -50,7 +50,7 @@ export function NetworkingPage() {
       id: 4,
       name: 'Radhika Jindal',
       branch: 'CSEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/radhika-2213b3345/',
       image: '/rj.png'
     },
@@ -59,7 +59,7 @@ export function NetworkingPage() {
       id: 5,
       name: 'Manvi',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'http://www.linkedin.com/in/manvi-falwaria-097834319/',
       image: '/manvi.png'
     },
@@ -67,7 +67,7 @@ export function NetworkingPage() {
       id: 6,
       name: 'Prachi Gupta',
       branch: 'CSEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/prachi-gupta-19ab61318/',
       image: '/pg.png'
     },
@@ -75,7 +75,7 @@ export function NetworkingPage() {
       id: 7,
       name: 'Kritika Singh',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/kritika1220/',
       image: '/kk.png'
     },
@@ -83,7 +83,7 @@ export function NetworkingPage() {
       id: 8,
       name: 'Jayati s. Tiwary',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/jayati-s-tiwary/',
       image: '/jayati.png'
     },
@@ -91,7 +91,7 @@ export function NetworkingPage() {
       id: 9,
       name: 'Payal',
       branch: 'CSEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/payal-b8a5a2323/',
       image: '/payal.jpg'
     },
@@ -99,7 +99,7 @@ export function NetworkingPage() {
       id: 10,
       name: 'Aafia Iqbal',
       branch: 'AIML',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/aafia-iqbal/',
       image: '/aafia.jpg'
     },
@@ -107,7 +107,7 @@ export function NetworkingPage() {
       id: 11,
       name: 'Richa Sukla',
       branch: 'CSE',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/richa-sukla-2484482bb/',
       image: '/rs.png'
     },
@@ -115,7 +115,7 @@ export function NetworkingPage() {
       id: 12,
       name: 'Baani Kaur',
       branch: 'ECEAI',
-      year: '2nd Year',
+      year: '3rd Year',
       linkedin: 'https://www.linkedin.com/in/baani-kaur-048a61307/',
       image: '/baani.jpg'
     },
@@ -123,7 +123,7 @@ export function NetworkingPage() {
       id: 13,
       name: 'Sripriya Agarwal',
       branch: 'ECEAI',
-      year: '4th Year',
+      year: '',
       linkedin: 'https://www.linkedin.com/in/sripriya-agarwal-483475261//',
       image: '/sripriya.jpeg'
     },
@@ -131,7 +131,7 @@ export function NetworkingPage() {
       id: 14,
       name: 'Joysa Jain',
       branch: 'CSEAI',
-      year: '3rd Year',
+      year: '4th Year',
       linkedin: 'https://www.linkedin.com/in/joysa-jain-86b589283/',
       image: '/joysa.jpeg'
     },
@@ -139,7 +139,7 @@ export function NetworkingPage() {
       id: 15,
       name: 'Aarohi Chaddha',
       branch: 'CSEAI',
-      year: '3rd Year',
+      year: '4th Year',
       linkedin: 'https://www.linkedin.com/in/aarohi-chadha/',
       image: '/aarohi.jpeg'
     },
@@ -147,7 +147,7 @@ export function NetworkingPage() {
       id: 16,
       name: 'Aditi Choudhary',
       branch: 'ECEAI',
-      year: '1st Year',
+      year: '2nd Year',
       linkedin: 'https://www.linkedin.com/in/aditi-choudhary-2044822a8/',
       image: '/aditi.jpg'
     },
@@ -155,7 +155,7 @@ export function NetworkingPage() {
       id: 17,
       name: 'Vrinda',
       branch: 'CSE',
-      year: '1st Year',
+      year: '2nd Year',
       linkedin: 'https://www.linkedin.com/in/vrinda-garg-13a525372/',
       image: '/vrinda.png'
     }
@@ -267,7 +267,7 @@ export function NetworkingPage() {
                   </h3>
                   <div className="flex items-center gap-2 text-sm mt-1" style={{ color: '#A0AEC0' }}>
                     <GraduationCap size={14} />
-                    {student.branch} • {student.year}
+                    {student.branch}{student.year ? ` • ${student.year}` : ''}
                   </div>
                   <a
                     href={student.linkedin}
