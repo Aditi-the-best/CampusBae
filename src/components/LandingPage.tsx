@@ -462,7 +462,7 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
             The dedicated team supporting CampusBae's growth
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto" style={{ marginTop: '2rem' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto" style={{ marginTop: '2rem' }}>
             {/* Aditi Choudhary */}
             <div className="group">
               <div 
