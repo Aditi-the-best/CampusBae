@@ -437,6 +437,123 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
           </div>
         </div>
       </div>
+
+      {/* Meet our Team Section */}
+      <div id="team-section" className="pb-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 
+            className="text-4xl md:text-5xl font-bold text-center mb-4"
+            style={{ color: '#EAEAEA' }}
+          >
+            Meet our{' '}
+            <span 
+              style={{ 
+                color: '#00E5FF', 
+                textShadow: '0 0 20px rgba(0, 229, 255, 0.6)' 
+              }}
+            >
+              Team
+            </span>
+          </h2>
+          <p 
+            className="text-xl text-center mb-12 max-w-2xl mx-auto"
+            style={{ color: '#A0AEC0' }}
+          >
+            The dedicated team supporting CampusBae's growth
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto" style={{ marginTop: '2rem' }}>
+            {/* Aditi Choudhary */}
+            <div className="group">
+              <div 
+                className="p-6 rounded-2xl backdrop-blur-sm border transition-all duration-300 hover:scale-105 hover:shadow-2xl text-center min-h-96"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(0, 229, 255, 0.2)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                <div className="mb-4">
+                  <div 
+                    className="w-28 h-28 mx-auto mb-4 transition-all duration-300 group-hover:scale-110 overflow-hidden border-2 border-cyan-400/30"
+                    style={{
+                      borderRadius: '50%',
+                      aspectRatio: '1 / 1'
+                    }}
+                  >
+                    <img 
+                      src="/aditi.jpg" 
+                      alt="Aditi Choudhary" 
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: '50%' }}
+                    />
+                  </div>
+                  <h3 
+                    className="text-xl font-bold mb-1"
+                    style={{ color: '#EAEAEA' }}
+                  >
+                    Aditi Choudhary
+                  </h3>
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: '#00BFFF' }}
+                  >
+                    ECEAI'29
+                  </p>
+                </div>
+                <p 
+                  className="text-sm leading-relaxed"
+                  style={{ color: '#A0AEC0' }}
+                >
+                  Always ready to support.
+                </p>
+              </div>
+            </div>
+
+            {/* Vrinda Garg */}
+            <div className="group">
+              <div 
+                className="p-6 rounded-2xl backdrop-blur-sm border transition-all duration-300 hover:scale-105 hover:shadow-2xl text-center min-h-96"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(0, 229, 255, 0.2)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                <div className="mb-4">
+                  <div 
+                    className="w-28 h-28 mx-auto mb-4 transition-all duration-300 group-hover:scale-110 overflow-hidden border-2 border-cyan-400/30 flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-400 text-white text-3xl font-bold"
+                    style={{
+                      borderRadius: '50%',
+                      aspectRatio: '1 / 1'
+                    }}
+                  >
+                    V
+                  </div>
+                  <h3 
+                    className="text-xl font-bold mb-1"
+                    style={{ color: '#EAEAEA' }}
+                  >
+                    Vrinda Garg
+                  </h3>
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: '#00BFFF' }}
+                  >
+                    CSE'29
+                  </p>
+                </div>
+                <p 
+                  className="text-sm leading-relaxed"
+                  style={{ color: '#A0AEC0' }}
+                >
+                  Always ready to assist.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
