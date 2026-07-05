@@ -124,7 +124,7 @@ export function NetworkingPage() {
       name: 'Sripriya Agarwal',
       branch: 'ECEAI',
       year: '',
-      linkedin: 'https://www.linkedin.com/in/sripriya-agarwal-483475261//',
+      linkedin: 'https://www.linkedin.com/in/sripriya-agarwal-483475261/',
       image: '/sripriya.jpeg'
     },
     {
