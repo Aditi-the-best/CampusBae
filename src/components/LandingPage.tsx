@@ -522,13 +522,18 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
               >
                 <div className="mb-4">
                   <div 
-                    className="w-28 h-28 mx-auto mb-4 transition-all duration-300 group-hover:scale-110 overflow-hidden border-2 border-cyan-400/30 flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-400 text-white text-3xl font-bold"
+                    className="w-28 h-28 mx-auto mb-4 transition-all duration-300 group-hover:scale-110 overflow-hidden border-2 border-cyan-400/30"
                     style={{
                       borderRadius: '50%',
                       aspectRatio: '1 / 1'
                     }}
                   >
-                    V
+                    <img 
+                      src="/vrinda.jpg" 
+                      alt="Vrinda Garg" 
+                      className="w-full h-full object-cover"
+                      style={{ borderRadius: '50%' }}
+                    />
                   </div>
                   <h3 
                     className="text-xl font-bold mb-1"

@@ -153,11 +153,11 @@ export function NetworkingPage() {
     },
     {
       id: 17,
-      name: 'Vrinda',
+      name: 'Vrinda Garg',
       branch: 'CSE',
       year: '2nd Year',
       linkedin: 'https://www.linkedin.com/in/vrinda-garg-13a525372/',
-      image: '/vrinda.png'
+      image: '/vrinda.jpg'
     }
   ];
 
