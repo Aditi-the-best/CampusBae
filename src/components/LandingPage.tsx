@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
-import { LoginForm } from './auth/LoginForm';
-import { ForgotPasswordForm } from './auth/ForgotPasswordForm';
 import { GlassCard } from './GlassCard';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -13,9 +11,6 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingPageProps) {
-  const [showLegacyLogin, setShowLegacyLogin] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { signInWithGoogle } = useAuth();
 
@@ -96,7 +91,7 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
 
               {/* Helpful Message */}
               <div className="text-center text-xs text-gray-400">
-                <p>🏫 Please login with your college email ending with <span className="font-semibold text-gray-300">@igdtuw.ac.in</span> if you have one.</p>
+                <p>Login with your college email ending with @igdtuw.ac.in if you have one.</p>
               </div>
             </div>
 
