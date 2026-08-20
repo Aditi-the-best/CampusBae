@@ -67,7 +67,7 @@ export function CompleteProfileForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-300 block">Full Name</label>
+              <label className="text-xs font-semibold block" style={{ color: '#EAEAEA' }}>Full Name</label>
               <Input
                 type="text"
                 placeholder="Name"
@@ -81,7 +81,7 @@ export function CompleteProfileForm() {
 
             {/* Enrollment Number */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-300 block">Enrollment Number</label>
+              <label className="text-xs font-semibold block" style={{ color: '#EAEAEA' }}>Enrollment Number</label>
               <Input
                 type="text"
                 placeholder="e.g. 04801012024"
@@ -95,7 +95,7 @@ export function CompleteProfileForm() {
 
             {/* Branch */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-300 block">Branch</label>
+              <label className="text-xs font-semibold block" style={{ color: '#EAEAEA' }}>Branch</label>
               <Input
                 type="text"
                 placeholder="e.g. ECE-AI"
@@ -109,7 +109,7 @@ export function CompleteProfileForm() {
 
             {/* Batch of (Graduation Year) */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-300 block">Batch of (Graduation Year)</label>
+              <label className="text-xs font-semibold block" style={{ color: '#EAEAEA' }}>Batch of (Graduation Year)</label>
               <Input
                 type="number"
                 placeholder="e.g. 2028"

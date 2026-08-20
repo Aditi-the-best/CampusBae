@@ -26,21 +26,21 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
       <div 
-        className="backdrop-blur-xl border-b border-white/15"
+        className="backdrop-blur-xl border border-white/15 rounded-full shadow-2xl transition-all duration-300 hover:border-[#00E5FF]/30"
         style={{
-          background: 'rgba(16, 24, 40, 0.5)',
+          background: 'rgba(16, 24, 40, 0.65)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="px-6 py-2 md:py-3 max-w-7xl mx-auto">
+          <div className="flex justify-between items-center h-10 md:h-12 gap-8">
             {/* Logo */}
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">
+            <div className="flex items-center cursor-pointer" onClick={() => handleNavigate('home')}>
+              <h1 className="text-lg font-bold">
                 <span style={{ color: '#EAEAEA' }}>Campus</span>
                 <span style={{ color: '#00E5FF', textShadow: '0 0 10px rgba(0, 229, 255, 0.5)' }}>Bae</span>
               </h1>
@@ -48,15 +48,15 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
             {/* Desktop Navigation */}
             <div className="hidden md:block">
-              <div className="flex items-center space-x-8">
+              <div className="flex items-center space-x-6 lg:space-x-8">
                 {navItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => handleNavigate(item.id)}
-                    className={`transition-colors duration-200 cursor-pointer ${
+                    className={`transition-all duration-200 cursor-pointer text-sm font-medium ${
                       currentPage === item.id
-                        ? 'text-[#00E5FF]'
-                        : 'text-[#EAEAEA] hover:text-[#00E5FF]'
+                        ? 'text-[#00E5FF] font-semibold scale-105'
+                        : 'text-[#EAEAEA]/80 hover:text-[#00E5FF] hover:scale-105'
                     }`}
                     style={{
                       textShadow: currentPage === item.id ? '0 0 8px rgba(0, 229, 255, 0.5)' : 'none'
@@ -75,8 +75,9 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 style={{ color: '#EAEAEA' }}
+                className="h-8 w-8 p-0"
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </Button>
             </div>
           </div>
@@ -84,20 +85,17 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 border-t border-white/10">
+          <div className="md:hidden border-t border-white/10 rounded-b-3xl">
+            <div className="px-4 py-3 space-y-1 text-center bg-gray-950/80 rounded-b-3xl">
               {navItems.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleNavigate(item.id)}
-                  className={`block px-3 py-2 w-full text-left transition-colors duration-200 cursor-pointer ${
+                  className={`block px-3 py-2 w-full text-center rounded-lg transition-colors duration-200 cursor-pointer text-sm ${
                     currentPage === item.id
-                      ? 'text-[#00E5FF]'
-                      : 'text-[#EAEAEA] hover:text-[#00E5FF]'
+                      ? 'text-[#00E5FF] bg-white/5'
+                      : 'text-[#EAEAEA] hover:text-[#00E5FF] hover:bg-white/5'
                   }`}
-                  style={{
-                    textShadow: currentPage === item.id ? '0 0 8px rgba(0, 229, 255, 0.5)' : 'none'
-                  }}
                 >
                   {item.label}
                 </button>
@@ -108,4 +106,5 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
       </div>
     </nav>
   );
+
 }
