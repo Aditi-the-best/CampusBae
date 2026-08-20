@@ -33,7 +33,7 @@ function AppContent() {
   useEffect(() => {
     if (!initialUrlChecked) {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -57,7 +57,7 @@ function AppContent() {
   useEffect(() => {
     const handleLoad = () => {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -86,10 +86,9 @@ function AppContent() {
   const getInitialPage = () => {
     // Check for password reset indicators IMMEDIATELY with comprehensive patterns
     const url = window.location.href;
-    const hasRecoveryToken = /[?&#](access_token|refresh_token|type=recovery)/.test(url) ||
-                            url.includes('reset-password') ||
-                            url.includes('password-reset') ||
-                            url.includes('type=recovery');
+    const hasRecoveryToken = url.includes('type=recovery') ||
+                             url.includes('reset-password') ||
+                             url.includes('password-reset');
     
     if (hasRecoveryToken) {
       console.log('� Password reset detected, showing reset page');
@@ -119,7 +118,7 @@ function AppContent() {
   useEffect(() => {
     const handleUrlChange = () => {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -182,20 +181,9 @@ function AppContent() {
     const isResetRequest = type === 'recovery' || 
                           hashType === 'recovery' ||
                           hash.includes('type=recovery') || 
-                          hash.includes('access_token') ||
-                          accessToken ||
-                          hashAccessToken ||
                           window.location.pathname === '/reset-password' ||
                           hash.includes('password-reset') ||
-                          // Additional Supabase recovery patterns
-                          hash.includes('access_token=') ||
-                          hash.includes('refresh_token=') ||
-                          hash.includes('expires_in=') ||
-                          hash.includes('token_type=') ||
-                          window.location.search.includes('access_token=') ||
-                          window.location.search.includes('refresh_token=') ||
-                          // Check for any auth-related parameters
-                          /[?&#](access_token|refresh_token|type=recovery)/.test(window.location.href);
+                          isRecovering;
     
     console.log('🔍 Reset Detection:', {
       isResetRequest,
@@ -203,7 +191,7 @@ function AppContent() {
       hashType,
       hasTokenInHash: hash.includes('access_token'),
       hasTokenInSearch: window.location.search.includes('access_token'),
-      regexMatch: /[?&#](access_token|refresh_token|type=recovery)/.test(window.location.href)
+      regexMatch: window.location.href.includes('type=recovery')
     });
     
     if (isResetRequest) {
