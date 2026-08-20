@@ -96,7 +96,7 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
             </div>
 
 
-            {/* Error and Success Messages */}
+            {/* Error Messages */}
             {authError && (
               <div className="mt-4 p-3 rounded-lg border border-red-500/50 bg-red-500/10 backdrop-blur-sm text-left">
                 <p className="text-red-400 font-medium text-sm flex items-center gap-2">
@@ -105,16 +105,9 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
                 </p>
               </div>
             )}
-            {successMessage && (
-              <div className="mt-4 p-4 rounded-lg border border-green-500/50 bg-green-500/10 backdrop-blur-sm text-left">
-                <p className="font-medium text-sm flex items-center gap-2" style={{color: '#22c55e'}}>
-                  <span style={{color: '#22c55e'}}>✅</span>
-                  {successMessage}
-                </p>
-              </div>
-            )}
           </GlassCard>
         </div>
+
 
 
         {/* Scroll to Meet the Creators */}
