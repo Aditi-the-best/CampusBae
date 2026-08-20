@@ -91,14 +91,44 @@ function AppContent() {
                              url.includes('password-reset');
     
     if (hasRecoveryToken) {
-      console.log('� Password reset detected, showing reset page');
+      console.log('🔒 Password reset detected, showing reset page');
       return 'reset-password';
+    }
+    
+    const path = window.location.pathname.substring(1);
+    const validPages = ['home', 'profile', 'resources', 'marketplace', 'societies', 'roadmap', 'networking', 'reset-password'];
+    if (validPages.includes(path)) {
+      return path as any;
     }
     
     return 'landing';
   };
   
   const [currentPage, setCurrentPage] = useState<'landing' | 'home' | 'profile' | 'resources' | 'marketplace' | 'societies' | 'roadmap' | 'networking' | 'reset-password'>(getInitialPage);
+
+  // Sync URL pathname with currentPage state
+  useEffect(() => {
+    const path = currentPage === 'landing' ? '/' : `/${currentPage}`;
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+  }, [currentPage]);
+
+  // Listen to browser Back/Forward navigation (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.substring(1);
+      const validPages = ['home', 'profile', 'resources', 'marketplace', 'societies', 'roadmap', 'networking', 'reset-password'];
+      if (validPages.includes(path)) {
+        setCurrentPage(path as any);
+      } else {
+        setCurrentPage('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [authError, setAuthError] = useState<string | null>(null);
   const [isPdfOpen, setIsPdfOpen] = useState<boolean>(false);
   
