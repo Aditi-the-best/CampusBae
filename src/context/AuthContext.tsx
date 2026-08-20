@@ -14,28 +14,42 @@ interface AuthContextType {
   user: User | null;
   userProfile: StudentProfile | null;
   loading: boolean;
+  authError: string | null;
+  setAuthError: (error: string | null) => void;
+  isRecovering: boolean;
+  setIsRecovering: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string, enrollmentNumber: string, branch: string, batch: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   getUserProfile: () => Promise<StudentProfile | null>;
   resetPassword: (email: string) => Promise<void>;
+  updateProfile: (profile: Partial<StudentProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({ 
   user: null,
   userProfile: null,
   loading: true,
+  authError: null,
+  setAuthError: () => {},
+  isRecovering: false,
+  setIsRecovering: () => {},
   signIn: async () => {},
   signUp: async () => {},
+  signInWithGoogle: async () => {},
   signOut: async () => {},
   getUserProfile: async () => null,
-  resetPassword: async () => {}
+  resetPassword: async () => {},
+  updateProfile: async () => {}
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isRecovering, setIsRecovering] = useState<boolean>(false);
 
   const signIn = async (email: string, password: string) => {
     
@@ -220,6 +234,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // The user will need to check their email and confirm before they can login
   };
 
+  const signInWithGoogle = async () => {
+    setAuthError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) throw error;
+  };
+
+  const updateProfile = async (profileData: Partial<StudentProfile>) => {
+    if (!user) throw new Error('No authenticated user');
+    
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        name: profileData.name,
+        enrollment_number: profileData.enrollment_number,
+        branch: profileData.branch,
+        batch: profileData.batch
+      }
+    });
+    
+    if (error) throw error;
+    
+    if (data.user) {
+      setUser(data.user);
+      const userMeta = data.user.user_metadata || {};
+      setUserProfile({
+        name: userMeta.name || 'Not available',
+        email: data.user.email || 'Not available',
+        enrollment_number: userMeta.enrollment_number || userMeta.enrollmentNumber || 'Not available',
+        branch: userMeta.branch || 'Not available',
+        batch: userMeta.batch || 'Not available'
+      });
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -364,6 +416,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         if (mounted) {
           const newUser = session?.user ?? null;
+          
+          if (newUser && newUser.email) {
+            const emailLower = newUser.email.toLowerCase();
+            const isValidDomain = emailLower.endsWith('@igdtuw.ac.in') || emailLower.endsWith('@gmail.com');
+            
+            if (!isValidDomain) {
+              await supabase.auth.signOut();
+              setUser(null);
+              setUserProfile(null);
+              setLoading(false);
+              return;
+            }
+          }
+          
           setUser(newUser);
           setLoading(false); // Set loading to false immediately after setting user
           
@@ -389,10 +455,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         const userMeta = currentUser?.user_metadata || {};
         
-        
-        // We don't use a separate students table anymore - all profile data is in user_metadata
-        // This makes the system more reliable and doesn't require database schema
-        
         // Build profile data from metadata only
         const data = {
           name: userMeta.name || 'Not available',
@@ -402,12 +464,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           batch: userMeta.batch || 'Not available'
         };
         
-        
         if (mounted) {
           setUserProfile(data as StudentProfile);
         }
-        
-        // No need to create database records since we use user_metadata only
         
       } catch (error) {
         if (mounted) {
@@ -436,8 +495,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for changes on auth state (login, logout, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 Auth state changed event:', event);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecovering(true);
+      }
+      
       if (mounted) {
         const newUser = session?.user ?? null;
+        
+        if (newUser && newUser.email) {
+          const emailLower = newUser.email.toLowerCase();
+          const isValidDomain = emailLower.endsWith('@igdtuw.ac.in') || emailLower.endsWith('@gmail.com');
+          
+          if (!isValidDomain) {
+            setAuthError('🏫 Please use your official college email (@igdtuw.ac.in) or Gmail to login.');
+            await supabase.auth.signOut();
+            setUser(null);
+            setUserProfile(null);
+            setLoading(false);
+            return;
+          }
+        }
+        
         setUser(newUser);
         setLoading(false); // Set loading to false immediately
         
@@ -457,7 +536,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signIn, signUp, signOut, getUserProfile, resetPassword }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      userProfile, 
+      loading, 
+      authError, 
+      setAuthError, 
+      isRecovering, 
+      setIsRecovering, 
+      signIn, 
+      signUp, 
+      signInWithGoogle, 
+      signOut, 
+      getUserProfile, 
+      resetPassword,
+      updateProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );

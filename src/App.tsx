@@ -13,9 +13,17 @@ import { NetworkingPage } from './components/NetworkingPage';
 import { PasswordResetPage } from './components/auth/PasswordResetPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
+import { CompleteProfileForm } from './components/auth/CompleteProfileForm';
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, isRecovering, userProfile } = useAuth();
+  
+  const isProfileIncomplete = !!user && (
+    !userProfile || 
+    !userProfile.enrollment_number || userProfile.enrollment_number === 'Not available' ||
+    !userProfile.branch || userProfile.branch === 'Not available' ||
+    !userProfile.batch || userProfile.batch === 'Not available'
+  );
   
   // IMMEDIATE URL check before anything else can process
   const [initialUrlChecked, setInitialUrlChecked] = useState(false);
@@ -208,7 +216,7 @@ function AppContent() {
 
     // Only handle regular navigation if no reset tokens detected
     if (!loading && !isResetRequest) {
-      if (user && currentPage === 'landing') {
+      if (user && !isProfileIncomplete && currentPage === 'landing') {
         console.log('📍 User logged in, going to home');
         setCurrentPage('home');
       } else if (!user && currentPage !== 'landing') {
@@ -216,7 +224,7 @@ function AppContent() {
         setCurrentPage('landing');
       }
     }
-  }, [user, loading]); // Removed currentPage from deps to prevent loops
+  }, [user, loading, isProfileIncomplete]); // Removed currentPage from deps to prevent loops
 
   const handleNavigate = (page: string, filters?: any) => {
     setAuthError(null);
@@ -278,9 +286,21 @@ function AppContent() {
 
   // Special case for password reset page - show only the reset component
   // FORCE reset page if we detected recovery tokens immediately
-  if (forceResetPage || currentPage === 'reset-password') {
+  if (forceResetPage || currentPage === 'reset-password' || isRecovering) {
     console.log('🚨 SHOWING PASSWORD RESET PAGE (forced or detected)');
     return <PasswordResetPage />;
+  }
+
+  // Show profile completion page if user is logged in but profile is not setup
+  if (user && isProfileIncomplete) {
+    return (
+      <div className="min-h-screen relative flex flex-col">
+        <GalaxyBackground />
+        <main className="relative z-10 flex-1">
+          <CompleteProfileForm />
+        </main>
+      </div>
+    );
   }
 
   return (
