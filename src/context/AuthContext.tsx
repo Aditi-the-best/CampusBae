@@ -86,80 +86,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (name: string, email: string, password: string, enrollmentNumber: string, branch: string, batch: string) => {
-    // Validate college email domain
-    if (!email.endsWith('@igdtuw.ac.in')) {
-      throw new Error('🏫 Please use your official IGDTUW college email address (@igdtuw.ac.in)');
-    }
-
     // Validate email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@igdtuw\.ac\.in$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      throw new Error('📞 Invalid email format. Please use a valid IGDTUW email address.');
-    }
-
-    // Enhanced validation for IGDTUW email structure
-    const localPart = email.split('@')[0];
-    
-    // Check minimum length
-    if (localPart.length < 5) {
-      throw new Error('🏫 Please use your complete college email address (minimum 5 characters before @igdtuw.ac.in).');
-    }
-
-    // Check for invalid patterns
-    if (localPart.includes('..') || localPart.startsWith('.') || localPart.endsWith('.')) {
-      throw new Error('📞 Invalid email format. Please check your email address.');
-    }
-
-    // More restrictive validation for realistic email structure
-    const validLocalPartRegex = /^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$/;
-    if (!validLocalPartRegex.test(localPart)) {
-      throw new Error('📞 Please enter a valid IGDTUW email address.');
-    }
-
-    // Check for suspicious patterns that indicate fake emails
-    const suspiciousPatterns = [
-      /^test/i, /^fake/i, /^dummy/i, /^sample/i,
-      /test$/i, /fake$/i, /dummy$/i, /sample$/i,
-      /123456/, /qwerty/i, /asdf/i, /^admin/i,
-      /^user/i, /^student/i, /^demo/i
-    ];
-    
-    const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(localPart));
-    if (isSuspicious) {
-      throw new Error('🏫 Please use your actual IGDTUW college email address, not a test or fake email.');
-    }
-
-    // Enhanced IGDTUW email pattern validation
-    // IGDTUW emails follow pattern: name###[bt|mt|phd][branch][year]@igdtuw.ac.in
-    // Example: ishanvi048bteceai24@igdtuw.ac.in
-    
-    // Check if it follows the basic structure: letters + 3 digits + degree + branch + year
-    const igdtuwEmailPattern = /^[a-zA-Z]+[0-9]{3}(bt|mt|phd)(cseai|cse|ece|mae|eceai|mac|it|aiml|dmam)(2[2-5])$/;
-    
-    if (!igdtuwEmailPattern.test(localPart)) {
-      // Break down the validation to give specific error messages
-      const nameNumbersPattern = /^[a-zA-Z]+[0-9]{3}/;
-      if (!nameNumbersPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must start with your name followed by 3 digits (e.g., ishanvi048...)');
-      }
-      
-      const degreePattern = /(bt|mt|phd)/;
-      if (!degreePattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must include degree code: bt (BTech), mt (MTech), or phd (PhD)');
-      }
-      
-      const branchPattern = /(cseai|cse|ece|mae|eceai|mac|it|aiml|dmam)/;
-      if (!branchPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must include valid branch code: cseai, cse, ece, mae, eceai, mac, it, aiml, or dmam');
-      }
-      
-      const yearPattern = /(2[2-5])$/;
-      if (!yearPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must end with admission year: 22, 23, 24, or 25');
-      }
-      
-      // If we reach here, there's some other formatting issue
-      throw new Error('🏫 Please use correct IGDTUW email format: yourname###bt/mt/phd + branch + year@igdtuw.ac.in (e.g., ishanvi048bteceai24@igdtuw.ac.in)');
+      throw new Error('📞 Invalid email format. Please use a valid email address.');
     }
 
     
@@ -284,18 +214,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('📧 Please enter a valid email address.');
     }
 
-    // Use same email validation as signup - just check domain and basic format
     const trimmedEmail = email.trim().toLowerCase();
     
-    // Check domain first
-    if (!trimmedEmail.endsWith('@igdtuw.ac.in')) {
-      throw new Error('🏫 Please use your official IGDTUW college email address (@igdtuw.ac.in).');
-    }
-
     // Check basic email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@igdtuw\.ac\.in$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(trimmedEmail)) {
-      throw new Error('📞 Invalid email format. Please use a valid IGDTUW email address.');
+      throw new Error('📞 Invalid email format. Please enter a valid email address.');
     }
 
     // Now with SendGrid SMTP configured, try to send the reset email
@@ -417,19 +341,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           const newUser = session?.user ?? null;
           
-          if (newUser && newUser.email) {
-            const emailLower = newUser.email.toLowerCase();
-            const isValidDomain = emailLower.endsWith('@igdtuw.ac.in') || emailLower.endsWith('@gmail.com');
-            
-            if (!isValidDomain) {
-              await supabase.auth.signOut();
-              setUser(null);
-              setUserProfile(null);
-              setLoading(false);
-              return;
-            }
-          }
-          
           setUser(newUser);
           setLoading(false); // Set loading to false immediately after setting user
           
@@ -502,20 +413,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (mounted) {
         const newUser = session?.user ?? null;
-        
-        if (newUser && newUser.email) {
-          const emailLower = newUser.email.toLowerCase();
-          const isValidDomain = emailLower.endsWith('@igdtuw.ac.in') || emailLower.endsWith('@gmail.com');
-          
-          if (!isValidDomain) {
-            setAuthError('🏫 Please use your official college email (@igdtuw.ac.in) or Gmail to login.');
-            await supabase.auth.signOut();
-            setUser(null);
-            setUserProfile(null);
-            setLoading(false);
-            return;
-          }
-        }
         
         setUser(newUser);
         setLoading(false); // Set loading to false immediately

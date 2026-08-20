@@ -14,20 +14,6 @@ export function CompleteProfileForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const branches = [
-    { value: 'cse', label: 'CSE (Computer Science & Engineering)' },
-    { value: 'cseai', label: 'CSE-AI (Computer Science & Engineering - AI)' },
-    { value: 'ece', label: 'ECE (Electronics & Communication Engineering)' },
-    { value: 'eceai', label: 'ECE-AI (Electronics & Communication Engineering - AI)' },
-    { value: 'it', label: 'IT (Information Technology)' },
-    { value: 'mae', label: 'MAE (Mechanical & Automation Engineering)' },
-    { value: 'mac', label: 'MAC (Mathematics & Computing)' },
-    { value: 'aiml', label: 'AIML (Artificial Intelligence & Machine Learning)' },
-    { value: 'dmam', label: 'DMAM (Dual Degree Management & Automation)' }
-  ];
-
-  const batches = Array.from({ length: 7 }, (_, i) => (2024 + i).toString());
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
@@ -38,12 +24,12 @@ export function CompleteProfileForm() {
       setError('📝 Please enter your Enrollment Number.');
       return;
     }
-    if (!branch) {
-      setError('🎓 Please select your branch.');
+    if (!branch.trim()) {
+      setError('🎓 Please enter your branch.');
       return;
     }
-    if (!batch) {
-      setError('📅 Please select your batch year.');
+    if (!batch.trim()) {
+      setError('📅 Please enter your batch year.');
       return;
     }
 
@@ -54,10 +40,9 @@ export function CompleteProfileForm() {
       await updateProfile({
         name: name.trim(),
         enrollment_number: enrollmentNumber.trim(),
-        branch: branch,
+        branch: branch.trim(),
         batch: parseInt(batch)
       });
-      // Profile update will automatically refresh the AuthContext profile
     } catch (err: any) {
       setError(err.message || 'Failed to update profile. Please try again.');
     } finally {
@@ -67,7 +52,7 @@ export function CompleteProfileForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md mx-auto">
+      <div className="w-full mx-auto" style={{ maxWidth: '400px' }}>
         <GlassCard className="p-8 border border-white/10" hover={false}>
           <div className="text-center mb-6">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_15px_rgba(0,229,255,0.4)]">
@@ -108,42 +93,34 @@ export function CompleteProfileForm() {
               />
             </div>
 
-            {/* Branch Selection */}
+            {/* Branch */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-300 block">Branch</label>
-              <select
+              <Input
+                type="text"
+                placeholder="e.g. ECE-AI"
                 value={branch}
                 onChange={(e) => setBranch(e.target.value)}
                 required
-                className="w-full h-9 px-3 py-1 bg-gray-900/90 border border-white/10 rounded-md text-white text-sm focus:border-[#00E5FF] outline-none transition-colors"
+                className="w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#00E5FF] transition-colors"
                 disabled={isLoading}
-              >
-                <option value="" disabled className="text-gray-500">Select your branch</option>
-                {branches.map((b) => (
-                  <option key={b.value} value={b.value} className="bg-gray-900 text-white">
-                    {b.label}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
-            {/* Batch Selection */}
+            {/* Batch of (Graduation Year) */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-300 block">Batch of (Graduation Year)</label>
-              <select
+              <Input
+                type="number"
+                placeholder="e.g. 2028"
                 value={batch}
                 onChange={(e) => setBatch(e.target.value)}
                 required
-                className="w-full h-9 px-3 py-1 bg-gray-900/90 border border-white/10 rounded-md text-white text-sm focus:border-[#00E5FF] outline-none transition-colors"
+                className="w-full bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#00E5FF] transition-colors"
                 disabled={isLoading}
-              >
-                <option value="" disabled className="text-gray-500">Select graduation year</option>
-                {batches.map((year) => (
-                  <option key={year} value={year} className="bg-gray-900 text-white">
-                    {year}
-                  </option>
-                ))}
-              </select>
+                min="2020"
+                max="2035"
+              />
             </div>
 
             {/* Error Message */}
@@ -180,7 +157,7 @@ export function CompleteProfileForm() {
               <button
                 type="button"
                 onClick={signOut}
-                className="w-full text-center text-gray-400 hover:text-white text-xs py-2 transition-colors cursor-pointer"
+                className="w-full text-center text-gray-400 hover:text-white text-xs py-2 transition-colors cursor-pointer bg-transparent border-none"
                 disabled={isLoading}
               >
                 Log Out / Switch Account
@@ -190,5 +167,6 @@ export function CompleteProfileForm() {
         </GlassCard>
       </div>
     </div>
+
   );
 }
