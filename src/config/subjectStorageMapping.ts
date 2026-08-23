@@ -32,7 +32,11 @@ export const subjectToStorageMap: { [key: string]: string } = {
   'IKS/UHV': 'IKS&UHV',
   'Design and Analysis of Algorithms (DAA)': 'DAA',
   'Operating Systems (OS)': 'OS',
-  'Fundamentals of Devops (FD)': 'Devops'
+  'Fundamentals of Devops (FD)': 'Devops',
+  'Computer Aided Engineering': 'CAE',
+  'Engineering Materials (EM)': 'EMat',
+  'Introduction to Robotics and Automation': 'Robotics',
+  'Cyber Security Awareness': 'CyberSec'
 };
 
 // Reverse mapping for display names

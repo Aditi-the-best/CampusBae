@@ -348,10 +348,44 @@ export const subjectMapping: SubjectMapping = {
       'Programming Tools for Mathematics - PTM (BAS 108)',
       'Soft Skills and Personality Development - SSPD (HMC 102)'
     ]
+  },
+  'R&AI': {
+    '1': [
+      'Probability and Statistics - PS (BAS 103)',
+      'Communication Skills - CS (HMC 101)',
+      'Environmental Sciences - EVS (BAS 104)',
+      'Computer Aided Engineering',
+      'Engineering Mechanics - EM (BMA 103)',
+      'Basics of Electrical and Electronics Engineering - BEE (BEC 101)'
+    ],
+    '2': [
+      'Applied Mathematics - AM (BAS 101)',
+      'Applied Physics - AP (BAS 102)',
+      'Engineering Materials (EM)',
+      'Introduction to Robotics and Automation',
+      'Soft Skills and Personality Development - SSPD (HMC 102)'
+    ]
+  },
+  'CSE(CS)': {
+    '1': [
+      'Probability and Statistics - PS (BAS 103)',
+      'Environmental Sciences - EVS (BAS 104)',
+      'Communication Skills - CS (HMC 101)',
+      'Programming with Python - PP (BAI 101)',
+      'Web Application Development - WAD (BCS 102)',
+      'IT Workshop - ITW (BAI 102)'
+    ],
+    '2': [
+      'Applied Mathematics - AM (BAS 101)',
+      'Environmental Sciences - EVS (BAS 104)',
+      'Object Oriented Programming System - OOPS (BIT 102)',
+      'Cyber Security Awareness',
+      'Soft Skills and Personality Development - SSPD (HMC 102)'
+    ]
   }
 };
 
-export const branches = ['CSE', 'CSE-AI', 'ECE', 'ECE-AI', 'IT', 'AI&ML', 'MAE/DMAM', 'MAC'];
+export const branches = ['CSE', 'CSE-AI', 'ECE', 'ECE-AI', 'IT', 'AI&ML', 'MAE/DMAM', 'MAC', 'R&AI', 'CSE(CS)'];
 export const semesters = ['1', '2', '3', '4', '5', '6', '7', '8'];
 export const types = ['notes', 'pyqs', 'syllab', 'book'];
 

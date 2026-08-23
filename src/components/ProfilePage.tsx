@@ -207,12 +207,13 @@ export function ProfilePage() {
   };
 
   const getTodaysDate = () => {
-    const today = new Date(2025, 8, 9); // September 9, 2025 (month is 0-indexed)
-    return today.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    });
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    };
+    return new Date().toLocaleDateString('en-US', options);
   };
 
   const getAttendanceColor = (percentage: number) => {
