@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
-import { LoginForm } from './auth/LoginForm';
-import { SignupForm } from './auth/SignupForm';
-import { ForgotPasswordForm } from './auth/ForgotPasswordForm';
+import { GlassCard } from './GlassCard';
+import { useAuth } from '../context/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 interface LandingPageProps {
   onLoginSuccess: () => void;
@@ -11,15 +11,24 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingPageProps) {
-  const [showLogin, setShowLogin] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { signInWithGoogle } = useAuth();
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    onAuthError('');
+    try {
+      await signInWithGoogle();
+    } catch (err: any) {
+      onAuthError(err.message || 'Google Login failed. Please try again.');
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Main Landing Section */}
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col justify-start pt-24 pb-12 px-4">
       <div className="text-center max-w-4xl mx-auto">
         {/* Hero Section */}
         <div className="mb-8">
@@ -38,180 +47,102 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
           </h1>
           
           <p 
-            className="text-xl md:text-2xl mb-12 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
             style={{ color: '#A0AEC0' }}
           >
             Your all-in-one campus companion for IGDTUW students.
           </p>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          {/* Login Button */}
-          <Button
-            size="lg"
-            onClick={() => {
-              setShowLogin(true);
-              setShowForm(true);
-              setSignupSuccess(false);
-              onAuthError(''); // Clear any errors
-            }}
-            className={`
-              text-lg px-12 py-4 rounded-full
-              transition-all duration-300
-              hover:scale-105 hover:shadow-2xl
-            `}
-            style={{
-              background: showLogin 
-                ? 'linear-gradient(135deg, #0D47A1, #00BFFF)'
-                : 'transparent',
-              color: '#EAEAEA',
-              border: showLogin ? 'none' : '2px solid #00BFFF',
-              boxShadow: showLogin ? '0 8px 32px rgba(0, 191, 255, 0.3)' : 'none'
-            }}
-          >
-            Login
-          </Button>
+        {/* Auth Glass Card */}
+        <div className="max-w-md mx-auto mb-12 mt-6">
+          <GlassCard className="p-8 border border-white/10" hover={false}>
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-white mb-2">Login</h2>
+                <p className="text-gray-400 text-sm">
+                  Enter the campus portal with a single click.
+                </p>
+              </div>
 
-          {/* Signup Button */}
-          <Button
-            size="lg"
-            onClick={() => {
-              setShowLogin(false);
-              setShowForm(true);
-              setSignupSuccess(false);
-              onAuthError(''); // Clear any errors
-            }}
-            className={`
-              text-lg px-12 py-4 rounded-full
-              transition-all duration-300
-              hover:scale-105
-            `}
-            style={{
-              background: !showLogin 
-                ? 'linear-gradient(135deg, #0D47A1, #00BFFF)'
-                : 'transparent',
-              color: '#EAEAEA',
-              border: !showLogin ? 'none' : '2px solid #00BFFF',
-              boxShadow: !showLogin ? '0 8px 32px rgba(0, 191, 255, 0.3)' : 'none'
-            }}
-          >
-            Signup
-          </Button>
-        </div>
+              {/* Google Sign In Button */}
+              <Button
+                size="lg"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading}
+                className="w-full text-white font-semibold py-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-103 hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] cursor-pointer"
+                style={{
+                  background: 'linear-gradient(135deg, #0D47A1, #00BFFF)',
+                  border: 'none',
+                }}
+              >
+                {isGoogleLoading ? (
+                  <Loader2 className="animate-spin w-5 h-5" />
+                ) : (
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#FFFFFF" opacity="0.8"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FFFFFF" opacity="0.8"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#FFFFFF" opacity="0.9"/>
+                  </svg>
+                )}
+                {isGoogleLoading ? 'Connecting...' : 'Continue with Google'}
+              </Button>
 
-        {/* Auth Forms */}
-        {showForm && (
-          <div className="max-w-md mx-auto mb-12">
-            {showForgotPassword ? (
-              <ForgotPasswordForm 
-                onSuccess={(message) => {
-                  setSuccessMessage(message);
-                  onAuthError(''); // Clear any errors
-                  setShowForgotPassword(false);
-                  setShowLogin(true);
-                }}
-                onError={onAuthError}
-                onBackToLogin={() => {
-                  setShowForgotPassword(false);
-                  setShowLogin(true);
-                  onAuthError('');
-                  setSuccessMessage('');
-                }}
-              />
-            ) : showLogin ? (
-              <LoginForm 
-                onSuccess={onLoginSuccess} 
-                onError={onAuthError} 
-                hasError={!!authError}
-                onForgotPassword={() => {
-                  setShowForgotPassword(true);
-                  onAuthError('');
-                }}
-              />
-            ) : (
-              <SignupForm 
-                onSuccess={() => {
-                  setSignupSuccess(true);
-                  setShowLogin(true);
-                  onAuthError(''); // Clear any previous errors
-                }} 
-                onError={onAuthError} 
-                hasError={!!authError}
-              />
-            )}
+              {/* Helpful Message */}
+              <div className="text-center text-xs text-gray-400">
+                <p>Login with your college email ending with @igdtuw.ac.in if you have one.</p>
+              </div>
+            </div>
+
+
+            {/* Error Messages */}
             {authError && (
-              <div className="mt-4 p-3 rounded-lg border border-red-500/50 bg-red-500/10 backdrop-blur-sm">
+              <div className="mt-4 p-3 rounded-lg border border-red-500/50 bg-red-500/10 backdrop-blur-sm text-left">
                 <p className="text-red-400 font-medium text-sm flex items-center gap-2">
                   <span className="text-red-500">⚠️</span>
                   {authError}
                 </p>
               </div>
             )}
-            {successMessage && (
-              <div className="mt-4 p-4 rounded-lg border border-green-500/50 bg-green-500/10 backdrop-blur-sm">
-                <p className="font-medium text-sm flex items-center gap-2" style={{color: '#22c55e'}}>
-                  <span style={{color: '#22c55e'}}>✅</span>
-                  {successMessage}
-                </p>
-              </div>
-            )}
-            {signupSuccess && showLogin && (
-              <div className="mt-4 p-4 rounded-lg border border-green-500/50 bg-green-500/10 backdrop-blur-sm">
-                <p className="font-medium text-sm flex items-center gap-2" style={{color: '#22c55e !important'}}>
-                  <span style={{color: '#22c55e'}}>✅</span>
-                  Signup Successful! Please verify your IGDTUW email.
-                </p>
-                <div className="text-xs mt-3 space-y-1" style={{color: '#22c55e', opacity: 0.9}}>
-                  <p>📧 <strong>Check your IGDTUW email inbox</strong> for verification link</p>
-                  <p>📁 <strong>Check spam/junk folder</strong> if not in inbox</p>
-                  <p>⏱️ <strong>Wait 5-10 minutes</strong> for email delivery</p>
-                  <p>🔗 <strong>Click the verification link</strong>, then return here to login</p>
-                </div>
-                <div className="mt-3 pt-2 border-t border-green-500/20">
-                  <p className="text-xs" style={{color: '#22c55e', opacity: 0.7}}>
-                    💡 <strong>Tip:</strong> Make sure you used your correct IGDTUW email address
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+          </GlassCard>
+        </div>
+
+
 
         {/* Scroll to Meet the Creators */}
-        {!showForm && (
-          <div className="mt-24 mb-8">
-            <div 
-              className="flex flex-col items-center cursor-pointer group transition-all duration-300 hover:scale-105"
-              onClick={() => {
-                const creatorsSection = document.getElementById('creators-section');
-                creatorsSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
+        <div className="mt-24 mb-8">
+          <div 
+            className="flex flex-col items-center cursor-pointer group transition-all duration-300 hover:scale-105"
+            onClick={() => {
+              const creatorsSection = document.getElementById('creators-section');
+              creatorsSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <p 
+              className="text-lg mb-2 group-hover:text-cyan-400 transition-colors duration-300"
+              style={{ color: '#A0AEC0' }}
             >
-              <p 
-                className="text-lg mb-2 group-hover:text-cyan-400 transition-colors duration-300"
-                style={{ color: '#A0AEC0' }}
+              Scroll to meet the creators
+            </p>
+            <div 
+              className="animate-bounce group-hover:text-cyan-400 transition-colors duration-300"
+              style={{ color: '#00BFFF' }}
+            >
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2"
               >
-                Scroll to meet the creators
-              </p>
-              <div 
-                className="animate-bounce group-hover:text-cyan-400 transition-colors duration-300"
-                style={{ color: '#00BFFF' }}
-              >
-                <svg 
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2"
-                >
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-              </div>
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
             </div>
           </div>
-        )}
+        </div>
+
 
         {/* Floating elements */}
         <div className="absolute top-1/4 left-10 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-3xl animate-pulse" />

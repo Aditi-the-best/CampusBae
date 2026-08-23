@@ -13,9 +13,17 @@ import { NetworkingPage } from './components/NetworkingPage';
 import { PasswordResetPage } from './components/auth/PasswordResetPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
+import { CompleteProfileForm } from './components/auth/CompleteProfileForm';
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, isRecovering, userProfile } = useAuth();
+  
+  const isProfileIncomplete = !!user && (
+    !userProfile || 
+    !userProfile.enrollment_number || userProfile.enrollment_number === 'Not available' ||
+    !userProfile.branch || userProfile.branch === 'Not available' ||
+    !userProfile.batch || userProfile.batch === 'Not available'
+  );
   
   // IMMEDIATE URL check before anything else can process
   const [initialUrlChecked, setInitialUrlChecked] = useState(false);
@@ -25,7 +33,7 @@ function AppContent() {
   useEffect(() => {
     if (!initialUrlChecked) {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -49,7 +57,7 @@ function AppContent() {
   useEffect(() => {
     const handleLoad = () => {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -78,20 +86,49 @@ function AppContent() {
   const getInitialPage = () => {
     // Check for password reset indicators IMMEDIATELY with comprehensive patterns
     const url = window.location.href;
-    const hasRecoveryToken = /[?&#](access_token|refresh_token|type=recovery)/.test(url) ||
-                            url.includes('reset-password') ||
-                            url.includes('password-reset') ||
-                            url.includes('type=recovery');
+    const hasRecoveryToken = url.includes('type=recovery') ||
+                             url.includes('reset-password') ||
+                             url.includes('password-reset');
     
     if (hasRecoveryToken) {
-      console.log('� Password reset detected, showing reset page');
+      console.log('🔒 Password reset detected, showing reset page');
       return 'reset-password';
+    }
+    
+    const path = window.location.pathname.substring(1);
+    const validPages = ['home', 'profile', 'resources', 'marketplace', 'societies', 'roadmap', 'networking', 'reset-password'];
+    if (validPages.includes(path)) {
+      return path as any;
     }
     
     return 'landing';
   };
   
   const [currentPage, setCurrentPage] = useState<'landing' | 'home' | 'profile' | 'resources' | 'marketplace' | 'societies' | 'roadmap' | 'networking' | 'reset-password'>(getInitialPage);
+
+  // Sync URL pathname with currentPage state
+  useEffect(() => {
+    const path = currentPage === 'landing' ? '/' : `/${currentPage}`;
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+  }, [currentPage]);
+
+  // Listen to browser Back/Forward navigation (popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.substring(1);
+      const validPages = ['home', 'profile', 'resources', 'marketplace', 'societies', 'roadmap', 'networking', 'reset-password'];
+      if (validPages.includes(path)) {
+        setCurrentPage(path as any);
+      } else {
+        setCurrentPage('landing');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const [authError, setAuthError] = useState<string | null>(null);
   const [isPdfOpen, setIsPdfOpen] = useState<boolean>(false);
   
@@ -111,7 +148,7 @@ function AppContent() {
   useEffect(() => {
     const handleUrlChange = () => {
       const currentUrl = window.location.href;
-      const hasRecoveryTokens = /[?&#](access_token|refresh_token|type=recovery)/.test(currentUrl) ||
+      const hasRecoveryTokens = currentUrl.includes('type=recovery') ||
                                currentUrl.includes('password-reset') ||
                                currentUrl.includes('reset-password');
       
@@ -174,20 +211,9 @@ function AppContent() {
     const isResetRequest = type === 'recovery' || 
                           hashType === 'recovery' ||
                           hash.includes('type=recovery') || 
-                          hash.includes('access_token') ||
-                          accessToken ||
-                          hashAccessToken ||
                           window.location.pathname === '/reset-password' ||
                           hash.includes('password-reset') ||
-                          // Additional Supabase recovery patterns
-                          hash.includes('access_token=') ||
-                          hash.includes('refresh_token=') ||
-                          hash.includes('expires_in=') ||
-                          hash.includes('token_type=') ||
-                          window.location.search.includes('access_token=') ||
-                          window.location.search.includes('refresh_token=') ||
-                          // Check for any auth-related parameters
-                          /[?&#](access_token|refresh_token|type=recovery)/.test(window.location.href);
+                          isRecovering;
     
     console.log('🔍 Reset Detection:', {
       isResetRequest,
@@ -195,7 +221,7 @@ function AppContent() {
       hashType,
       hasTokenInHash: hash.includes('access_token'),
       hasTokenInSearch: window.location.search.includes('access_token'),
-      regexMatch: /[?&#](access_token|refresh_token|type=recovery)/.test(window.location.href)
+      regexMatch: window.location.href.includes('type=recovery')
     });
     
     if (isResetRequest) {
@@ -208,7 +234,7 @@ function AppContent() {
 
     // Only handle regular navigation if no reset tokens detected
     if (!loading && !isResetRequest) {
-      if (user && currentPage === 'landing') {
+      if (user && !isProfileIncomplete && currentPage === 'landing') {
         console.log('📍 User logged in, going to home');
         setCurrentPage('home');
       } else if (!user && currentPage !== 'landing') {
@@ -216,7 +242,7 @@ function AppContent() {
         setCurrentPage('landing');
       }
     }
-  }, [user, loading]); // Removed currentPage from deps to prevent loops
+  }, [user, loading, isProfileIncomplete]); // Removed currentPage from deps to prevent loops
 
   const handleNavigate = (page: string, filters?: any) => {
     setAuthError(null);
@@ -278,9 +304,21 @@ function AppContent() {
 
   // Special case for password reset page - show only the reset component
   // FORCE reset page if we detected recovery tokens immediately
-  if (forceResetPage || currentPage === 'reset-password') {
+  if (forceResetPage || currentPage === 'reset-password' || isRecovering) {
     console.log('🚨 SHOWING PASSWORD RESET PAGE (forced or detected)');
     return <PasswordResetPage />;
+  }
+
+  // Show profile completion page if user is logged in but profile is not setup
+  if (user && isProfileIncomplete) {
+    return (
+      <div className="min-h-screen relative flex flex-col">
+        <GalaxyBackground />
+        <main className="relative z-10 flex-1">
+          <CompleteProfileForm />
+        </main>
+      </div>
+    );
   }
 
   return (

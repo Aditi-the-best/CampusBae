@@ -1,8 +1,8 @@
 // Simple test to check resources table
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://rbtgopbhokfaxfqlzyhh.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJidGdvcGJob2tmYXhmcWx6eWhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxNzg2MjAsImV4cCI6MjA1MTc1NDYyMH0.H8fNt_8KJ88EcZJg4WjxoFnPNsE7kBNPgQ0xOxrcA7I'
+const supabaseUrl = 'https://wjrkwynlxmgnqscaauij.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqcmt3eW5seG1nbnFzY2FhdWlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcyNzQ2MDQsImV4cCI6MjA3Mjg1MDYwNH0.LURW69RIvyVoLi1v0Q9W2rR9hxSR1EPoWw2ZkdyvYQo'
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 

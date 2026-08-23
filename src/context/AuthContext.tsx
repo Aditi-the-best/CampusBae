@@ -14,28 +14,42 @@ interface AuthContextType {
   user: User | null;
   userProfile: StudentProfile | null;
   loading: boolean;
+  authError: string | null;
+  setAuthError: (error: string | null) => void;
+  isRecovering: boolean;
+  setIsRecovering: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string, enrollmentNumber: string, branch: string, batch: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   getUserProfile: () => Promise<StudentProfile | null>;
   resetPassword: (email: string) => Promise<void>;
+  updateProfile: (profile: Partial<StudentProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({ 
   user: null,
   userProfile: null,
   loading: true,
+  authError: null,
+  setAuthError: () => {},
+  isRecovering: false,
+  setIsRecovering: () => {},
   signIn: async () => {},
   signUp: async () => {},
+  signInWithGoogle: async () => {},
   signOut: async () => {},
   getUserProfile: async () => null,
-  resetPassword: async () => {}
+  resetPassword: async () => {},
+  updateProfile: async () => {}
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isRecovering, setIsRecovering] = useState<boolean>(false);
 
   const signIn = async (email: string, password: string) => {
     
@@ -72,80 +86,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (name: string, email: string, password: string, enrollmentNumber: string, branch: string, batch: string) => {
-    // Validate college email domain
-    if (!email.endsWith('@igdtuw.ac.in')) {
-      throw new Error('🏫 Please use your official IGDTUW college email address (@igdtuw.ac.in)');
-    }
-
     // Validate email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@igdtuw\.ac\.in$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      throw new Error('📞 Invalid email format. Please use a valid IGDTUW email address.');
-    }
-
-    // Enhanced validation for IGDTUW email structure
-    const localPart = email.split('@')[0];
-    
-    // Check minimum length
-    if (localPart.length < 5) {
-      throw new Error('🏫 Please use your complete college email address (minimum 5 characters before @igdtuw.ac.in).');
-    }
-
-    // Check for invalid patterns
-    if (localPart.includes('..') || localPart.startsWith('.') || localPart.endsWith('.')) {
-      throw new Error('📞 Invalid email format. Please check your email address.');
-    }
-
-    // More restrictive validation for realistic email structure
-    const validLocalPartRegex = /^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$/;
-    if (!validLocalPartRegex.test(localPart)) {
-      throw new Error('📞 Please enter a valid IGDTUW email address.');
-    }
-
-    // Check for suspicious patterns that indicate fake emails
-    const suspiciousPatterns = [
-      /^test/i, /^fake/i, /^dummy/i, /^sample/i,
-      /test$/i, /fake$/i, /dummy$/i, /sample$/i,
-      /123456/, /qwerty/i, /asdf/i, /^admin/i,
-      /^user/i, /^student/i, /^demo/i
-    ];
-    
-    const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(localPart));
-    if (isSuspicious) {
-      throw new Error('🏫 Please use your actual IGDTUW college email address, not a test or fake email.');
-    }
-
-    // Enhanced IGDTUW email pattern validation
-    // IGDTUW emails follow pattern: name###[bt|mt|phd][branch][year]@igdtuw.ac.in
-    // Example: ishanvi048bteceai24@igdtuw.ac.in
-    
-    // Check if it follows the basic structure: letters + 3 digits + degree + branch + year
-    const igdtuwEmailPattern = /^[a-zA-Z]+[0-9]{3}(bt|mt|phd)(cseai|cse|ece|mae|eceai|mac|it|aiml|dmam)(2[2-5])$/;
-    
-    if (!igdtuwEmailPattern.test(localPart)) {
-      // Break down the validation to give specific error messages
-      const nameNumbersPattern = /^[a-zA-Z]+[0-9]{3}/;
-      if (!nameNumbersPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must start with your name followed by 3 digits (e.g., ishanvi048...)');
-      }
-      
-      const degreePattern = /(bt|mt|phd)/;
-      if (!degreePattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must include degree code: bt (BTech), mt (MTech), or phd (PhD)');
-      }
-      
-      const branchPattern = /(cseai|cse|ece|mae|eceai|mac|it|aiml|dmam)/;
-      if (!branchPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must include valid branch code: cseai, cse, ece, mae, eceai, mac, it, aiml, or dmam');
-      }
-      
-      const yearPattern = /(2[2-5])$/;
-      if (!yearPattern.test(localPart)) {
-        throw new Error('🏫 IGDTUW email must end with admission year: 22, 23, 24, or 25');
-      }
-      
-      // If we reach here, there's some other formatting issue
-      throw new Error('🏫 Please use correct IGDTUW email format: yourname###bt/mt/phd + branch + year@igdtuw.ac.in (e.g., ishanvi048bteceai24@igdtuw.ac.in)');
+      throw new Error('📞 Invalid email format. Please use a valid email address.');
     }
 
     
@@ -220,6 +164,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // The user will need to check their email and confirm before they can login
   };
 
+  const signInWithGoogle = async () => {
+    setAuthError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
+    if (error) throw error;
+  };
+
+  const updateProfile = async (profileData: Partial<StudentProfile>) => {
+    if (!user) throw new Error('No authenticated user');
+    
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        name: profileData.name,
+        enrollment_number: profileData.enrollment_number,
+        branch: profileData.branch,
+        batch: profileData.batch
+      }
+    });
+    
+    if (error) throw error;
+    
+    if (data.user) {
+      setUser(data.user);
+      const userMeta = data.user.user_metadata || {};
+      setUserProfile({
+        name: userMeta.name || 'Not available',
+        email: data.user.email || 'Not available',
+        enrollment_number: userMeta.enrollment_number || userMeta.enrollmentNumber || 'Not available',
+        branch: userMeta.branch || 'Not available',
+        batch: userMeta.batch || 'Not available'
+      });
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -232,18 +214,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('📧 Please enter a valid email address.');
     }
 
-    // Use same email validation as signup - just check domain and basic format
     const trimmedEmail = email.trim().toLowerCase();
     
-    // Check domain first
-    if (!trimmedEmail.endsWith('@igdtuw.ac.in')) {
-      throw new Error('🏫 Please use your official IGDTUW college email address (@igdtuw.ac.in).');
-    }
-
     // Check basic email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@igdtuw\.ac\.in$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(trimmedEmail)) {
-      throw new Error('📞 Invalid email format. Please use a valid IGDTUW email address.');
+      throw new Error('📞 Invalid email format. Please enter a valid email address.');
     }
 
     // Now with SendGrid SMTP configured, try to send the reset email
@@ -364,6 +340,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         if (mounted) {
           const newUser = session?.user ?? null;
+          
           setUser(newUser);
           setLoading(false); // Set loading to false immediately after setting user
           
@@ -389,10 +366,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         const userMeta = currentUser?.user_metadata || {};
         
-        
-        // We don't use a separate students table anymore - all profile data is in user_metadata
-        // This makes the system more reliable and doesn't require database schema
-        
         // Build profile data from metadata only
         const data = {
           name: userMeta.name || 'Not available',
@@ -402,12 +375,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           batch: userMeta.batch || 'Not available'
         };
         
-        
         if (mounted) {
           setUserProfile(data as StudentProfile);
         }
-        
-        // No need to create database records since we use user_metadata only
         
       } catch (error) {
         if (mounted) {
@@ -436,8 +406,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for changes on auth state (login, logout, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 Auth state changed event:', event);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecovering(true);
+      }
+      
       if (mounted) {
         const newUser = session?.user ?? null;
+        
         setUser(newUser);
         setLoading(false); // Set loading to false immediately
         
@@ -457,7 +433,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signIn, signUp, signOut, getUserProfile, resetPassword }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      userProfile, 
+      loading, 
+      authError, 
+      setAuthError, 
+      isRecovering, 
+      setIsRecovering, 
+      signIn, 
+      signUp, 
+      signInWithGoogle, 
+      signOut, 
+      getUserProfile, 
+      resetPassword,
+      updateProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );

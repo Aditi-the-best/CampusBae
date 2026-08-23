@@ -7,7 +7,50 @@ import { useAuth } from '../context/AuthContext';
 import { attendanceService, type AttendanceStats } from '../services/attendanceService';
 
 export function ProfilePage() {
-  const { signOut, userProfile } = useAuth();
+  const { signOut, userProfile, updateProfile } = useAuth();
+  
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEnrollment, setEditEnrollment] = useState('');
+  const [editBranch, setEditBranch] = useState('');
+  const [editBatch, setEditBatch] = useState('');
+  const [profileUpdateLoading, setProfileUpdateLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  const openEditProfile = () => {
+    setEditName(userProfile?.name || '');
+    setEditEnrollment(userProfile?.enrollment_number === 'Not available' ? '' : userProfile?.enrollment_number || '');
+    setEditBranch(userProfile?.branch === 'Not available' ? '' : userProfile?.branch || '');
+    setEditBatch(userProfile?.batch === 'Not available' ? '' : userProfile?.batch?.toString() || '');
+    setProfileError(null);
+    setIsEditingProfile(true);
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) {
+      setProfileError('Please enter your name.');
+      return;
+    }
+    setProfileUpdateLoading(true);
+    setProfileError(null);
+    try {
+      if (updateProfile) {
+        await updateProfile({
+          name: editName.trim(),
+          enrollment_number: editEnrollment.trim(),
+          branch: editBranch,
+          batch: parseInt(editBatch)
+        });
+        setIsEditingProfile(false);
+      }
+    } catch (err: any) {
+      setProfileError(err.message || 'Failed to update profile.');
+    } finally {
+      setProfileUpdateLoading(false);
+    }
+  };
+
   const [newSubject, setNewSubject] = useState('');
   const [subjects, setSubjects] = useState<string[]>([]);
   const [attendance, setAttendance] = useState<Record<string, AttendanceStats>>({});
@@ -227,29 +270,120 @@ export function ProfilePage() {
       <div className="max-w-4xl mx-auto">
         {/* Profile Card */}
         <GlassCard className="mb-8">
-          <div className="flex items-center space-x-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">
-                {userProfile?.name?.charAt(0)?.toUpperCase() || 'U'}
-              </span>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-2" style={{ color: '#EAEAEA' }}>
-                {userProfile?.name || 'Loading...'}
-              </h1>
-              <p style={{ color: '#A0AEC0' }}>
-                Enrollment No: {userProfile?.enrollment_number === 'Not available' ? 'Not set' : (userProfile?.enrollment_number || 'Loading...')} • Branch: {userProfile?.branch === 'Not available' ? 'Not set' : (userProfile?.branch || 'Loading...')}
-              </p>
-              <p style={{ color: '#A0AEC0' }}>
-                Batch: {!userProfile?.batch ? 'Not set' : (userProfile.batch || 'Loading...')} • Email: {userProfile?.email || 'Loading...'}
-              </p>
-              {(!userProfile?.enrollment_number || userProfile?.branch === 'Not available' || !userProfile?.batch) && (
-                <p className="text-xs mt-2" style={{ color: '#A0AEC0', opacity: 0.7 }}>
-                  ℹ️ Some profile fields are not set. This information was collected during signup but may not be stored in the current database schema.
-                </p>
+          {isEditingProfile ? (
+            <form onSubmit={handleUpdateProfile} className="space-y-4 text-left">
+              <h3 className="text-xl font-bold text-white mb-2">Edit Profile Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-300 block">Full Name</label>
+                  <Input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    required
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-300 block">Enrollment Number</label>
+                  <Input
+                    type="text"
+                    value={editEnrollment}
+                    onChange={(e) => setEditEnrollment(e.target.value)}
+                    required
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-300 block">Branch</label>
+                  <select
+                    value={editBranch}
+                    onChange={(e) => setEditBranch(e.target.value)}
+                    required
+                    className="w-full h-9 px-3 py-1 bg-gray-900 border border-white/10 rounded-md text-white text-sm outline-none"
+                  >
+                    <option value="" disabled className="text-gray-500">Select your branch</option>
+                    <option value="cse">CSE</option>
+                    <option value="cseai">CSE-AI</option>
+                    <option value="ece">ECE</option>
+                    <option value="eceai">ECE-AI</option>
+                    <option value="it">IT</option>
+                    <option value="mae">MAE</option>
+                    <option value="mac">MAC</option>
+                    <option value="aiml">AIML</option>
+                    <option value="dmam">DMAM</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-300 block">Batch of (Graduation Year)</label>
+                  <select
+                    value={editBatch}
+                    onChange={(e) => setEditBatch(e.target.value)}
+                    required
+                    className="w-full h-9 px-3 py-1 bg-gray-900 border border-white/10 rounded-md text-white text-sm outline-none"
+                  >
+                    <option value="" disabled className="text-gray-500">Select graduation year</option>
+                    {Array.from({ length: 7 }, (_, i) => (2024 + i).toString()).map((year) => (
+                      <option key={year} value={year} className="bg-gray-900 text-white">{year}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
+              {profileError && (
+                <div className="p-2 rounded bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+                  {profileError}
+                </div>
               )}
+              
+              <div className="flex gap-2 justify-end pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsEditingProfile(false)}
+                  disabled={profileUpdateLoading}
+                  className="text-gray-400 hover:text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={profileUpdateLoading}
+                  style={{ background: 'linear-gradient(135deg, #0D47A1, #00BFFF)', border: 'none' }}
+                >
+                  {profileUpdateLoading ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
+                    {userProfile?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold mb-2" style={{ color: '#EAEAEA' }}>
+                    {userProfile?.name || 'Loading...'}
+                  </h1>
+                  <p style={{ color: '#A0AEC0' }}>
+                    Enrollment No: {userProfile?.enrollment_number === 'Not available' ? 'Not set' : (userProfile?.enrollment_number || 'Loading...')} • Branch: {userProfile?.branch?.toUpperCase() === 'NOT AVAILABLE' ? 'Not set' : (userProfile?.branch?.toUpperCase() || 'Loading...')}
+                  </p>
+                  <p style={{ color: '#A0AEC0' }}>
+                    Batch: {!userProfile?.batch ? 'Not set' : (userProfile.batch || 'Loading...')} • Email: {userProfile?.email || 'Loading...'}
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={openEditProfile}
+                variant="ghost"
+                className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 h-9 px-4 rounded-full border border-cyan-400/20"
+              >
+                Edit Profile
+              </Button>
             </div>
-          </div>
+          )}
         </GlassCard>
 
         {/* Attendance Tracker */}
