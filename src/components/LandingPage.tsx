@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { LoginForm } from './auth/LoginForm';
 import { SignupForm } from './auth/SignupForm';
 import { ForgotPasswordForm } from './auth/ForgotPasswordForm';
+import { useAuth } from '../context/AuthContext';
 
 interface LandingPageProps {
   onLoginSuccess: () => void;
@@ -11,6 +12,7 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingPageProps) {
+  const { developerBypass } = useAuth();
   const [showLogin, setShowLogin] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
@@ -175,6 +177,16 @@ export function LandingPage({ onLoginSuccess, onAuthError, authError }: LandingP
                 </div>
               </div>
             )}
+            {/* Developer Bypass Button */}
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={developerBypass}
+                className="text-xs text-[#00E5FF] hover:underline opacity-80 hover:opacity-100 transition-opacity"
+              >
+                🔧 Developer Bypass (Offline Testing)
+              </button>
+            </div>
           </div>
         )}
 
