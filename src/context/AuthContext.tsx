@@ -19,7 +19,6 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   getUserProfile: () => Promise<StudentProfile | null>;
   resetPassword: (email: string) => Promise<void>;
-  developerBypass: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({ 
@@ -30,8 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => {},
   signOut: async () => {},
   getUserProfile: async () => null,
-  resetPassword: async () => {},
-  developerBypass: () => {}
+  resetPassword: async () => {}
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -458,31 +456,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const developerBypass = () => {
-    const mockUser = {
-      id: 'mock-user-id',
-      email: 'aditi006bteceai25@igdtuw.ac.in',
-      user_metadata: {
-        name: 'Aditi Choudhary',
-        enrollment_number: '00601182025',
-        branch: 'ECEAI',
-        batch: 2029
-      }
-    } as any;
-    
-    setUser(mockUser);
-    setUserProfile({
-      name: 'Aditi Choudhary',
-      email: 'aditi006bteceai25@igdtuw.ac.in',
-      enrollment_number: '00601182025',
-      branch: 'ECEAI',
-      batch: 2029
-    });
-    setLoading(false);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signIn, signUp, signOut, getUserProfile, resetPassword, developerBypass }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, signIn, signUp, signOut, getUserProfile, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );
